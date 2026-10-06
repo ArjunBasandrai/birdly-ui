@@ -71,8 +71,15 @@ export function PredictionResults({
                   <span className="rank" aria-hidden="true">
                     {index + 1}
                   </span>
-                  <span className="species-name">
-                    {prediction.species_name}
+                  <span className="prediction-names">
+                    <span className="species-name">
+                      {prediction.common_name}
+                    </span>
+                    {prediction.scientific_name !== prediction.common_name && (
+                      <span className="scientific-name">
+                        {prediction.scientific_name}
+                      </span>
+                    )}
                   </span>
                 </div>
                 <span

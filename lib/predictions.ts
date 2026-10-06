@@ -1,8 +1,9 @@
 export const MAXIMUM_PREDICTIONS = 5;
 
 export type Prediction = {
-  species_name: string;
   taxon_id: number;
+  common_name: string;
+  scientific_name: string;
   score: number;
 };
 
@@ -13,8 +14,9 @@ function isPrediction(value: unknown): value is Prediction {
 
   const prediction = value as Partial<Prediction>;
   return (
-    typeof prediction.species_name === "string" &&
     typeof prediction.taxon_id === "number" &&
+    typeof prediction.common_name === "string" &&
+    typeof prediction.scientific_name === "string" &&
     typeof prediction.score === "number" &&
     Number.isFinite(prediction.score)
   );

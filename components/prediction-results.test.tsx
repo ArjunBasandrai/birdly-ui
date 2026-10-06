@@ -6,11 +6,36 @@ import { PredictionResults } from "@/components/prediction-results";
 import type { Prediction } from "@/lib/predictions";
 
 const predictions: Prediction[] = [
-  { species_name: "American Robin", taxon_id: 1, score: 0.742 },
-  { species_name: "Varied Thrush", taxon_id: 2, score: 0.131 },
-  { species_name: "Eastern Bluebird", taxon_id: 3, score: 0.064 },
-  { species_name: "Hermit Thrush", taxon_id: 4, score: 0.038 },
-  { species_name: "Wood Thrush", taxon_id: 5, score: 0.025 },
+  {
+    taxon_id: 1,
+    common_name: "American Robin",
+    scientific_name: "Turdus migratorius",
+    score: 0.742,
+  },
+  {
+    taxon_id: 2,
+    common_name: "Varied Thrush",
+    scientific_name: "Ixoreus naevius",
+    score: 0.131,
+  },
+  {
+    taxon_id: 3,
+    common_name: "Eastern Bluebird",
+    scientific_name: "Sialia sialis",
+    score: 0.064,
+  },
+  {
+    taxon_id: 4,
+    common_name: "Hermit Thrush",
+    scientific_name: "Catharus guttatus",
+    score: 0.038,
+  },
+  {
+    taxon_id: 5,
+    common_name: "Wood Thrush",
+    scientific_name: "Hylocichla mustelina",
+    score: 0.025,
+  },
 ];
 
 describe("PredictionResults", () => {
@@ -52,7 +77,8 @@ describe("PredictionResults", () => {
       assert.equal((markup.match(/prediction-primary/g) ?? []).length, 1);
 
       for (const prediction of returnedPredictions) {
-        assert.ok(markup.includes(prediction.species_name));
+        assert.ok(markup.includes(prediction.common_name));
+        assert.ok(markup.includes(prediction.scientific_name));
         assert.ok(
           markup.includes(
             `${(prediction.score * 100).toFixed(1)} percent confidence`,
@@ -61,7 +87,8 @@ describe("PredictionResults", () => {
       }
 
       for (const prediction of predictions.slice(count)) {
-        assert.ok(!markup.includes(prediction.species_name));
+        assert.ok(!markup.includes(prediction.common_name));
+        assert.ok(!markup.includes(prediction.scientific_name));
       }
     });
   }
@@ -76,6 +103,41 @@ describe("PredictionResults", () => {
 
     assert.match(markup, /aria-label="74\.2 percent confidence"/);
     assert.match(markup, /74\.2%/);
+  });
+
+  it("shows the common name above the scientific name", () => {
+    const markup = renderToStaticMarkup(
+      <PredictionResults
+        predictions={predictions.slice(0, 1)}
+        requestState="success"
+      />,
+    );
+
+    assert.match(markup, /class="species-name">American Robin</);
+    assert.match(markup, /class="scientific-name">Turdus migratorius<\/span>/);
+    assert.ok(
+      markup.indexOf("American Robin") < markup.indexOf("Turdus migratorius"),
+    );
+  });
+
+  it("does not repeat a fallback name", () => {
+    const fallbackName = "Poecile atricapillus";
+    const markup = renderToStaticMarkup(
+      <PredictionResults
+        predictions={[
+          {
+            taxon_id: 6,
+            common_name: fallbackName,
+            scientific_name: fallbackName,
+            score: 0.91,
+          },
+        ]}
+        requestState="success"
+      />,
+    );
+
+    assert.equal(markup.split(fallbackName).length - 1, 1);
+    assert.doesNotMatch(markup, /scientific-name/);
   });
 
   it("does not describe the idle state as a fixed-length result", () => {

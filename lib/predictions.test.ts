@@ -4,11 +4,36 @@ import { describe, it } from "node:test";
 import { parsePredictions, type Prediction } from "@/lib/predictions";
 
 const predictions: Prediction[] = [
-  { species_name: "American Robin", taxon_id: 1, score: 0.742 },
-  { species_name: "Varied Thrush", taxon_id: 2, score: 0.131 },
-  { species_name: "Eastern Bluebird", taxon_id: 3, score: 0.064 },
-  { species_name: "Hermit Thrush", taxon_id: 4, score: 0.038 },
-  { species_name: "Wood Thrush", taxon_id: 5, score: 0.025 },
+  {
+    taxon_id: 1,
+    common_name: "American Robin",
+    scientific_name: "Turdus migratorius",
+    score: 0.742,
+  },
+  {
+    taxon_id: 2,
+    common_name: "Varied Thrush",
+    scientific_name: "Ixoreus naevius",
+    score: 0.131,
+  },
+  {
+    taxon_id: 3,
+    common_name: "Eastern Bluebird",
+    scientific_name: "Sialia sialis",
+    score: 0.064,
+  },
+  {
+    taxon_id: 4,
+    common_name: "Hermit Thrush",
+    scientific_name: "Catharus guttatus",
+    score: 0.038,
+  },
+  {
+    taxon_id: 5,
+    common_name: "Wood Thrush",
+    scientific_name: "Hylocichla mustelina",
+    score: 0.025,
+  },
 ];
 
 describe("parsePredictions", () => {
@@ -24,13 +49,18 @@ describe("parsePredictions", () => {
     assert.equal(
       parsePredictions([
         ...predictions,
-        { species_name: "Gray Catbird", taxon_id: 6, score: 0.01 },
+        {
+          taxon_id: 6,
+          common_name: "Gray Catbird",
+          scientific_name: "Dumetella carolinensis",
+          score: 0.01,
+        },
       ]),
       null,
     );
   });
 
   it("rejects an invalid prediction record", () => {
-    assert.equal(parsePredictions([{ species_name: "American Robin" }]), null);
+    assert.equal(parsePredictions([{ common_name: "American Robin" }]), null);
   });
 });

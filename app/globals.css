@@ -394,6 +394,20 @@ label:focus-within,
   overflow-wrap: anywhere;
 }
 
+.prediction-names {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.scientific-name {
+  color: #5c6b61;
+  font-size: 0.9rem;
+  font-style: italic;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 .confidence {
   color: var(--forest);
   font-variant-numeric: tabular-nums;
