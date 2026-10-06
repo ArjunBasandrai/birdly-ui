@@ -4,8 +4,9 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Birdly — Bird identification",
-  description: "Identify a bird species from a selected area of a photograph.",
+  title: "Birdly Bird identification",
+  description:
+    "Identify bird species of New York state from uploaded photographs.",
 };
 
 export const viewport: Viewport = {
