@@ -341,6 +341,21 @@ label:focus-within,
   color: #68756c;
 }
 
+.empty-results {
+  margin-top: 20px;
+}
+
+.empty-results-title {
+  margin: 0;
+  color: var(--forest);
+  font-weight: 700;
+}
+
+.empty-results-help {
+  margin: 5px 0 0;
+  color: #68756c;
+}
+
 .prediction-list {
   padding: 0;
   margin: 16px 0 0;

@@ -19,17 +19,14 @@ import ReactCrop, {
 
 import "react-image-crop/dist/ReactCrop.css";
 
+import {
+  PredictionResults,
+  type RequestState,
+} from "@/components/prediction-results";
 import { cropImage } from "@/lib/crop-image";
+import { parsePredictions, type Prediction } from "@/lib/predictions";
 
 const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
-
-type Prediction = {
-  species_name: string;
-  taxon_id: number;
-  score: number;
-};
-
-type RequestState = "idle" | "loading" | "success" | "error";
 
 function getInitialCrop(width: number, height: number): PercentCrop {
   if (width >= height) {
@@ -44,20 +41,6 @@ function getInitialCrop(width: number, height: number): PercentCrop {
     makeAspectCrop({ unit: "%", width: 82 }, 1, width, height),
     width,
     height,
-  );
-}
-
-function isPrediction(value: unknown): value is Prediction {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  const prediction = value as Partial<Prediction>;
-  return (
-    typeof prediction.species_name === "string" &&
-    typeof prediction.taxon_id === "number" &&
-    typeof prediction.score === "number" &&
-    Number.isFinite(prediction.score)
   );
 }
 
@@ -251,22 +234,14 @@ export function BirdIdentifier() {
       }
 
       const responseBody: unknown = await response.json();
-      if (!Array.isArray(responseBody) || !responseBody.every(isPrediction)) {
+      const returnedPredictions = parsePredictions(responseBody);
+      if (returnedPredictions === null) {
         setRequestState("error");
         setRequestError("Birdly returned an invalid result. Try again.");
         return;
       }
 
-      const topPredictions = responseBody.slice(0, 5);
-      if (topPredictions.length === 0) {
-        setRequestState("error");
-        setRequestError(
-          "Birdly did not find a result. Adjust the crop and try again.",
-        );
-        return;
-      }
-
-      setPredictions(topPredictions);
+      setPredictions(returnedPredictions);
       setRequestState("success");
     } catch {
       setRequestState("error");
@@ -392,56 +367,10 @@ export function BirdIdentifier() {
         {requestError && <p className="error-message">{requestError}</p>}
       </div>
 
-      <section className="results" aria-labelledby="results-title">
-        <div className="results-heading">
-          <h2 id="results-title">Results</h2>
-          {requestState === "success" && <span>Top {predictions.length}</span>}
-        </div>
-
-        {requestState === "idle" && (
-          <p className="results-placeholder">
-            Your five most likely species will appear here after identification.
-          </p>
-        )}
-
-        {requestState === "loading" && (
-          <p className="results-placeholder" role="status">
-            Identifying…
-          </p>
-        )}
-
-        {requestState === "success" && (
-          <ol className="prediction-list">
-            {predictions.map((prediction, index) => {
-              const confidence = Math.max(
-                0,
-                Math.min(100, prediction.score * 100),
-              );
-              return (
-                <li
-                  className={
-                    index === 0 ? "prediction prediction-primary" : "prediction"
-                  }
-                  key={prediction.taxon_id}
-                >
-                  <div>
-                    <span className="rank" aria-hidden="true">
-                      {index + 1}
-                    </span>
-                    <span className="species-name">
-                      {prediction.species_name}
-                    </span>
-                  </div>
-                  <span className="confidence">{confidence.toFixed(1)}%</span>
-                  <span className="confidence-track" aria-hidden="true">
-                    <span style={{ width: `${confidence}%` }} />
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
-        )}
-      </section>
+      <PredictionResults
+        predictions={predictions}
+        requestState={requestState}
+      />
     </section>
   );
 }

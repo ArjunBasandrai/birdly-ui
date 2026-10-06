@@ -26,6 +26,7 @@ Open `http://localhost:3000`.
 npm run format
 npm run lint
 npm run typecheck
+npm test
 npm run build
 ```
 
